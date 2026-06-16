@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatApp_Shared.Models
+namespace ChatShared.Models
 {
     public class Group
     {
