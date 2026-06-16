@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Principal;
-using ChatApp_Shared.Models;
+using ChatShared.Models;
 
 namespace ChatServer.Storage
 {
