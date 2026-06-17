@@ -4,13 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatServer.Network
+namespace ChatClient.Network
 {
-    internal class ClientHandler
+    internal class TCPClient
     {
     }
 }
-
-//-Receive
-//- Send
-//- Disconnect
