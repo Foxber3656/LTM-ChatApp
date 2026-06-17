@@ -17,6 +17,9 @@ namespace ChatApp_Shared.Enums
         PrivateMessage,
         GroupMessage,
 
+        ServerBroadcast,
+        KickUser,
+
         // Group
         CreateGroup,
         AddMember,

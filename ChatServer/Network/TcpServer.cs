@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -12,70 +11,81 @@ namespace ChatServer.Network
     public class TCPServer
     {
         private Socket sckServer;
-        private Socket sckClient;
-        private readonly byte[] rcvBuffer = new byte[4096];
+        private readonly List<Socket> sckClients = new();
+        private readonly byte[] rcvBuffer = new byte[4096]; // ReceiveCallback
 
         //gui thong bao
         public Action<string>? Onlog;
 
+        // Socket -> Bind -> Listen -> Accept
         public void StartServer(int port)
         {
-            //tao sck
-            sckServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            try
+            {
+                //tao sck
+                sckServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-            //gan ket noi
-            IPEndPoint serverEP = new IPEndPoint(IPAddress.Any, port);
-            sckServer.Bind(serverEP);
+                //gan ket noi
+                IPEndPoint serverEP = new IPEndPoint(IPAddress.Any, port);
+                sckServer.Bind(serverEP);
 
-            //tao hang doi
-            sckServer.Listen(10);
+                //tao hang doi
+                sckServer.Listen(10);
 
-            //Ghi log 
-            Onlog?.Invoke($"Server started at port {port}");
+                //Ghi log 
+                Onlog?.Invoke($"Server started at port {port}");
 
-            //Cho ket noi
-            sckServer.BeginAccept(new AsyncCallback(AcceptCallback), null);
+                //Cho ket noi
+                sckServer.BeginAccept(new AsyncCallback(AcceptCallback), null);
+            }
+            catch (Exception ex)
+            {
+                Onlog?.Invoke(ex.Message);
+            }
         }
+
+        //accept va luu client vao list
         private void AcceptCallback(IAsyncResult result)
         {
-            sckClient = sckServer.EndAccept(result);
+            try
+            {
+                Socket client = sckServer.EndAccept(result);
+                sckClients.Add(client);
 
-            Onlog?.Invoke($"Client connected: {sckClient.RemoteEndPoint}");
-
-            //nhan du lieu
-            sckClient.BeginReceive(rcvBuffer, 0, rcvBuffer.Length, 
-                SocketFlags.None, new AsyncCallback(ReceiveCallBack), null);
-
-            //cho client
-            sckServer.BeginAccept(new AsyncCallback(AcceptCallback), null);
+                Onlog?.Invoke($"Client connected: {client.RemoteEndPoint}");
+                sckServer.BeginAccept(new AsyncCallback(AcceptCallback), null);
+            }
+            catch (Exception ex)
+            {
+                Onlog?.Invoke(ex.Message);
+            }
         }
-        private void ReceiveCallBack(IAsyncResult result)
+        //dem onl user
+        public int OnlineCount
         {
-            int size = sckClient.EndReceive(result);
-            if (size == 0)
-                return;
-
-            string msg = Encoding.UTF8.GetString(rcvBuffer, 0, size);
-            Onlog?.Invoke($"Client: {msg}");
-            sckClient.BeginReceive(rcvBuffer, 0, rcvBuffer.Length,
-                SocketFlags.None, new AsyncCallback(ReceiveCallBack), null);
+            get
+            {
+                return sckClients.Count;
+            }
         }
-        public void Send(string msg)
+        //dong server
+        public void StopServer()
         {
-            if (sckClient == null) return;
-            byte[] data = Encoding.UTF8.GetBytes(msg);
-            sckClient.Send(data);
+            foreach (Socket client in sckClients)
+            {
+                sckServer?.Close();
+                sckServer = null;
+            }
+            sckClients.Clear();
+            sckServer?.Close();
+            Onlog?.Invoke("Server stopped.");
+        }
+        public bool IsRunning
+        {
+            get
+            {
+                return sckServer != null;
+            }
         }
     }
 }
-
-/*
- * -------------------------
- * Chức năng:
- * - Tạo Socket Server.
- * - Bind Port.
- * - Listen Client.
- * - Accept Client.
- * - Receive dữ liệu.
- * - Send dữ liệu.
- */

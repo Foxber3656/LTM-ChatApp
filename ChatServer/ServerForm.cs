@@ -7,29 +7,33 @@ namespace ChatServer
         public ServerForm()
         {
             InitializeComponent();
-            serverManager = new TCPServer();
-            serverManager.Onlog += AddLog;
+            server = new TCPServer();
+            server.Onlog += AddLog;
         }
-        private TCPServer serverManager;
-
-        private void ServerForm_Load(object sender, EventArgs e)
+        #region methods
+        private void AddLog(string message)
         {
-
+            if (InvokeRequired)
+            {
+                Invoke(new Action<string>(AddLog), message);
+                return;
+            }
+            rtbLogs.AppendText(message + Environment.NewLine);
         }
+        #endregion
 
-        private void lbTitle_Click(object sender, EventArgs e)
+        private TCPServer server;
+
+
+        #region click
+        private void btnStart_Click(object sender, EventArgs e)
         {
-
+            server.StartServer(int.Parse(nbPort.Text));
         }
-
-        private void panel2_Paint(object sender, PaintEventArgs e)
+        private void btnStop_Click(object sender, EventArgs e)
         {
-
+            server.StopServer();
         }
-
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
+        #endregion
     }
 }
