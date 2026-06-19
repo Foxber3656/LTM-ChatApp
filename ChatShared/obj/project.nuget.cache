@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "5PNTbHnB8VQ=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\boysk\\OneDrive\\Desktop\\LTM-ChatApp-master\\ChatShared\\ChatShared.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\boysk\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.16\\microsoft.netcore.app.ref.9.0.16.nupkg.sha512",
+    "C:\\Users\\boysk\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.16\\microsoft.windowsdesktop.app.ref.9.0.16.nupkg.sha512",
+    "C:\\Users\\boysk\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.16\\microsoft.aspnetcore.app.ref.9.0.16.nupkg.sha512"
+  ],
+  "logs": []
+}

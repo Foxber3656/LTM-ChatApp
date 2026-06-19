@@ -1,9 +1,14 @@
+<<<<<<< HEAD
 ﻿using ChatServer.Network;
+=======
+using ChatServer.Network;
+>>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
 
 namespace ChatServer
 {
     public partial class ServerForm : Form
     {
+<<<<<<< HEAD
         private readonly TCPServer server = new();
         private readonly System.Windows.Forms.Timer timerClock = new();
         public ServerForm()
@@ -25,6 +30,14 @@ namespace ChatServer
             timerClock.Start();
         }
 
+=======
+        public ServerForm()
+        {
+            InitializeComponent();
+            server = new TCPServer();
+            server.Onlog += AddLog;
+        }
+>>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
         #region methods
         private void AddLog(string message)
         {
@@ -33,6 +46,7 @@ namespace ChatServer
                 Invoke(new Action<string>(AddLog), message);
                 return;
             }
+<<<<<<< HEAD
             rtbLogs.AppendText($"[{DateTime.Now:HH:mm:ss}] {message}\r\n");
             if (rtbLogs.Lines.Length > 500)
             {
@@ -248,5 +262,24 @@ namespace ChatServer
 
 
 
+=======
+            rtbLogs.AppendText(message + Environment.NewLine);
+        }
+        #endregion
+
+        private TCPServer server;
+
+
+        #region click
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            server.StartServer(int.Parse(nbPort.Text));
+        }
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            server.StopServer();
+        }
+        #endregion
+>>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
     }
 }

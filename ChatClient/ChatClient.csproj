@@ -8,4 +8,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+<<<<<<< HEAD
+=======
+  <ItemGroup>
+    <!-- Tham chiếu đến ChatShared (chứa Models và Enums) -->
+    <ProjectReference Include="..\ChatShared\ChatShared.csproj" />
+    <!-- Nếu bạn có ChatApp_Shared riêng cho Packet, hãy thêm tham chiếu ở đây -->
+  </ItemGroup>
+
+>>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
 </Project>
