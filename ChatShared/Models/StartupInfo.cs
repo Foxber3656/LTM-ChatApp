@@ -8,7 +8,8 @@ namespace ChatShared.Models
 {
     public class Startup
     {
-        public String onUser { get; set; }
-        public String group { get; set; }
+        public List<string> OnlineUsers { get; set; }
+
+        public List<string> Groups { get; set; }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ChatServer.Storage
 {
-    public class OfflineMessageRepository
+    public class OfflineMessage
     {
         private readonly string _path = @"..\..\..\..\Data\offline_messages.json";
         public List<OfflineMessage> GetAll()

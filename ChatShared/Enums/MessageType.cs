@@ -16,6 +16,7 @@ namespace ChatApp_Shared.Enums
         // Chat
         PrivateMessage,
         GroupMessage,
+        BroadcastMessage,
 
         ServerBroadcast,
         KickUser,
