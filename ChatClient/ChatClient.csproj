@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Tham chiếu đến ChatShared (chứa Models và Enums) -->
+    <ProjectReference Include="..\ChatShared\ChatShared.csproj" />
+    <!-- Nếu bạn có ChatApp_Shared riêng cho Packet, hãy thêm tham chiếu ở đây -->
+  </ItemGroup>
+
+</Project>
