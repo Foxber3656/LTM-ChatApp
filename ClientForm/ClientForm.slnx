@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="AuthForm/AuthForm.csproj" Id="d21510db-ea02-4582-a0f5-b4564e384839" />
+  <Project Path="ClientForm/ClientForm.csproj" />
+</Solution>
