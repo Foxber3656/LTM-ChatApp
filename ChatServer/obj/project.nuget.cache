@@ -1,13 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xd8DdZFKSdg=",
+  "dgSpecHash": "Ir9Rf38cBJw=",
   "success": true,
-  "projectFilePath": "C:\\Users\\boysk\\OneDrive\\Desktop\\LTM-ChatApp-master\\ChatServer\\ChatServer.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\boysk\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.16\\microsoft.netcore.app.ref.9.0.16.nupkg.sha512",
-    "C:\\Users\\boysk\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.16\\microsoft.windowsdesktop.app.ref.9.0.16.nupkg.sha512",
-    "C:\\Users\\boysk\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.16\\microsoft.aspnetcore.app.ref.9.0.16.nupkg.sha512",
-    "C:\\Users\\boysk\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\9.0.16\\microsoft.netcore.app.host.win-x64.9.0.16.nupkg.sha512"
-  ],
+  "projectFilePath": "D:\\1st\\LT_Mạng\\LTM_FINAL\\ChatApp\\ChatServer\\ChatServer.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }

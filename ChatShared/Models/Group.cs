@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChatShared.Models
+﻿namespace ChatShared.Models
 {
     public class Group
     {
-        public string Name { get; set; } = string.Empty;
+        public string GroupName { get; set; } = "";
+
+        public string Owner { get; set; } = "";
+
+        public int MemberCount
+        {
+            get {return Members.Count;}
+        }
+
         public List<string> Members { get; set; } = new();
     }
 }

@@ -9,43 +9,25 @@ namespace ChatServer.Storage
 {
     public static class JsonStorage
     {
-        public static List<T> Read<T>(string path)
+        private static readonly JsonSerializerOptions options = new()
         {
-            // Nếu file chưa tồn tại trả về danh sách rỗng
-            if (!File.Exists(path))
-                return new List<T>();
+            WriteIndented = true
+        };
+        public static List<T> Load<T>(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                Save(filePath, new List<T>());
+            }
+            string json = File.ReadAllText(filePath);
 
-            // Đọc toàn bộ nội dung file
-            string json = File.ReadAllText(path);
-
-            // Chuyển JSON thành danh sách đối tượng
             return JsonSerializer.Deserialize<List<T>>(json)
                    ?? new List<T>();
         }
-
-        public static void Write<T>(string path, List<T> data)
+        public static void Save<T>(string filePath, List<T> data)
         {
-            string json = JsonSerializer.Serialize(data,new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
-
-            File.WriteAllText(path, json);
+            string json = JsonSerializer.Serialize(data, options);
+            File.WriteAllText(filePath, json);
         }
     }
 }
-
-
-/*
- * -------------------------
- * Chức năng:
- * - Đọc dữ liệu từ file JSON.
- * - Ghi dữ liệu xuống file JSON.
- * - Là lớp nền cho toàn bộ Repository.
- *
- * Sử dụng cho:
- * - UserRepository
- * - MessageRepository
- * - GroupRepository
- * - OfflineMessageRepository
- */
