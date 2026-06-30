@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChatShared.Models
+﻿namespace ChatShared.Models
 {
     public class FileMessage
     {
@@ -13,5 +7,10 @@ namespace ChatShared.Models
         public string FileName { get; set; } = string.Empty;
         public long FileSize { get; set; }
         public string Extension { get; set; } = string.Empty;
+        public Guid FileId { get; set; } = Guid.NewGuid();
+        public int ChunkIndex { get; set; }
+        public int TotalChunks { get; set; }
+        public byte[] Data { get; set; } = Array.Empty<byte>();
+        public bool IsLastChunk { get; set; }
     }
 }

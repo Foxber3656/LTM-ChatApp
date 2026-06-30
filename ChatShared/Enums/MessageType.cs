@@ -13,14 +13,14 @@ namespace ChatApp_Shared.Enums
         Register,
         Logout,
 
+        //List 
+        UserList,
+        GroupList,
+
         // Chat
         PrivateMessage,
         GroupMessage,
-<<<<<<< HEAD
         BroadcastMessage,
-=======
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
-
         ServerBroadcast,
         KickUser,
 
@@ -30,8 +30,19 @@ namespace ChatApp_Shared.Enums
         RemoveMember,
 
         // File
+        FileStart,
+        FileChunk,
+        FileEnd,
+        FileAccept,
+        FileReject,
         FileTransfer,
+
+        //Media
         ImageTransfer,
+        ImageAccept,
+        ImageReject,
+        ImageChunk,
+        ImageEnd,
 
         // Status
         OnlineUsers,
@@ -46,6 +57,7 @@ namespace ChatApp_Shared.Enums
 
         // LAN Discovery
         DiscoveryRequest,
-        DiscoveryResponse
+        DiscoveryResponse,
+        
     }
 }

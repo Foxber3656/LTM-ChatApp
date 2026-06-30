@@ -14,5 +14,6 @@ namespace ChatApp_Shared.DTOs
         public string Receiver { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
         public DateTime TimeStamp { get; set; } = DateTime.Now;
+        public Guid MessageId { get; set; } = Guid.NewGuid();
     }
 }

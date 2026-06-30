@@ -1,25 +1,22 @@
-<<<<<<< HEAD
-﻿using ChatServer.Network;
-=======
 using ChatServer.Network;
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
 
 namespace ChatServer
 {
     public partial class ServerForm : Form
     {
-<<<<<<< HEAD
         private readonly TCPServer server = new();
         private readonly System.Windows.Forms.Timer timerClock = new();
+        private readonly UDPDiscoveryServer discoveryServer = new();
         public ServerForm()
         {
             InitializeComponent();
 
             server.Onlog += AddLog;
+            discoveryServer.OnLog += AddLog;
             server.OnUserListChanged += RefreshSystemTree;
             server.OnGroupListChanged += RefreshSystemTree;
             tvSystem.AfterSelect += tvSystem_AfterSelect;
-            cbTypeSend.SelectedIndexChanged +=cbTypeSend_SelectedIndexChanged;
+            cbTypeSend.SelectedIndexChanged += cbTypeSend_SelectedIndexChanged;
 
             timerClock.Interval = 1000;
             timerClock.Tick += (s, e) =>
@@ -29,15 +26,6 @@ namespace ChatServer
 
             timerClock.Start();
         }
-
-=======
-        public ServerForm()
-        {
-            InitializeComponent();
-            server = new TCPServer();
-            server.Onlog += AddLog;
-        }
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
         #region methods
         private void AddLog(string message)
         {
@@ -46,7 +34,7 @@ namespace ChatServer
                 Invoke(new Action<string>(AddLog), message);
                 return;
             }
-<<<<<<< HEAD
+
             rtbLogs.AppendText($"[{DateTime.Now:HH:mm:ss}] {message}\r\n");
             if (rtbLogs.Lines.Length > 500)
             {
@@ -111,7 +99,7 @@ namespace ChatServer
                 cbSelectedUser.Text = e.Node.Text;
             }
         }
-        private void cbTypeSend_SelectedIndexChanged(object sender,EventArgs e)
+        private void cbTypeSend_SelectedIndexChanged(object sender, EventArgs e)
         {
             cbTarget.Items.Clear();
             switch (cbTypeSend.Text)
@@ -150,6 +138,8 @@ namespace ChatServer
             if (server.IsRunning)
                 return;
             server.StartServer((int)nbPort.Value);
+            discoveryServer.Start((int)nbPort.Value);
+
             tsStatusServer.Text = "Server: ● Online";
             tsPort.Text = $"Port: {nbPort.Value}";
             RefreshSystemTree();
@@ -163,6 +153,8 @@ namespace ChatServer
                 return;
 
             server.StopServer();
+            discoveryServer.Stop();
+
             tsStatusServer.Text = "Server: ● Offline";
             RefreshSystemTree();
             tsUsers.Text = "Users: 0";
@@ -182,11 +174,25 @@ namespace ChatServer
                     break;
 
                 case "PRIVATE":
-                    MessageBox.Show("Private message sẽ triển khai ở Client.");
+
+                    if (cbTarget.SelectedItem == null)
+                        return;
+
+                    server.SendPrivateMessage(
+                        cbTarget.Text,
+                        txbBroadcast.Text);
+
                     break;
 
                 case "GROUP":
-                    MessageBox.Show("Group message sẽ triển khai ở Client.");
+
+                    if (cbTarget.SelectedItem == null)
+                        return;
+
+                    server.SendGroupMessage(
+                        cbTarget.Text,
+                        txbBroadcast.Text);
+
                     break;
 
                 default:
@@ -197,15 +203,10 @@ namespace ChatServer
         }
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            if (cbSelectedUser.SelectedItem == null)
-                return;
-
-            string username = cbSelectedUser.SelectedItem.ToString()!;
-
             txbBroadcast.Clear();
-                cbTypeSend.SelectedIndex = -1;
-                cbTarget.SelectedIndex = -1;
-            }
+            cbTypeSend.SelectedIndex = -1;
+            cbTarget.SelectedIndex = -1;
+        }
         private void btnView_Click(object sender, EventArgs e)
         {
             if (cbSelectedUser.SelectedItem == null)
@@ -256,30 +257,10 @@ namespace ChatServer
         {
             RefreshSystemTree();
             tsTime.Text = DateTime.Now.ToString("HH:mm:ss");
+            btnStop.Enabled = false;
+            cbTypeSend.SelectedIndex = 0;
         }
         #endregion
 
-
-
-
-=======
-            rtbLogs.AppendText(message + Environment.NewLine);
-        }
-        #endregion
-
-        private TCPServer server;
-
-
-        #region click
-        private void btnStart_Click(object sender, EventArgs e)
-        {
-            server.StartServer(int.Parse(nbPort.Text));
-        }
-        private void btnStop_Click(object sender, EventArgs e)
-        {
-            server.StopServer();
-        }
-        #endregion
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
     }
 }

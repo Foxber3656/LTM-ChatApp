@@ -1,38 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Message = ChatShared.Models.Message;
+﻿using ChatApp_Shared.DTOs;
 
 namespace ChatServer.Storage
 {
     public class MessageRepository
     {
-        private readonly string _path = @"..\..\..\..\Data\messages.json";
+        private readonly string file =
+            Path.Combine("Data", "messages.json");
 
-        public List<Message> GetAll()
+        private readonly List<MessagePacket> messages;
+
+        public MessageRepository()
         {
-            return JsonStorage.Read<Message>(_path);
+            Directory.CreateDirectory("Data");
+            messages = JsonStorage.Load<MessagePacket>(file);
+        }
+
+        public List<MessagePacket> GetAll()
+        {
+            return messages;
+        }
+
+        public void Add(MessagePacket message)
+        {
+            messages.Add(message);
+            Save();
+        }
+
+        public List<MessagePacket> GetConversation(string user1, string user2)
+        {
+            return messages.Where(x =>
+                (x.Sender == user1 && x.Receiver == user2) ||
+                (x.Sender == user2 && x.Receiver == user1))
+                .OrderBy(x => x.TimeStamp)
+                .ToList();
+        }
+
+        public List<MessagePacket> GetGroupMessages(string groupName)
+        {
+            return messages
+                .Where(x =>
+                    x.Type == ChatApp_Shared.Enums.MessageType.GroupMessage &&
+                    x.Receiver == groupName)
+                .OrderBy(x => x.TimeStamp)
+                .ToList();
+        }
+
+        public void Save()
+        {
+            JsonStorage.Save(file, messages);
         }
     }
 }
-
-
-/*
- * -------------------------
- * Chức năng:
- * - Lưu lịch sử chat.
- * - Truy xuất lịch sử hội thoại.
- * - Cập nhật trạng thái tin nhắn.
- * - Hỗ trợ thu hồi tin nhắn.
- *
- * Dữ liệu:
- * Data/messages.json
- *
- * Chức năng liên quan:
- * - Private Chat
- * - Group Chat
- * - History
- * - Recall Message
- */
