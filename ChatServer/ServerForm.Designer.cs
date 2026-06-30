@@ -28,38 +28,24 @@
         /// </summary>
         private void InitializeComponent()
         {
-            label1 = new Label();
             panel1 = new Panel();
             gbBroadCast = new GroupBox();
             cbTarget = new ComboBox();
             cbTypeSend = new ComboBox();
-<<<<<<< HEAD
             txbBroadcast = new TextBox();
-=======
-            textBox2 = new TextBox();
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             btnSend = new Button();
             btnCancel = new Button();
             label6 = new Label();
             label5 = new Label();
-<<<<<<< HEAD
             gbUserManagement = new GroupBox();
-=======
-            groupBox1 = new GroupBox();
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             cbSelectedUser = new ComboBox();
             btnView = new Button();
             btnKick = new Button();
             lbSelcetdUserTile = new Label();
             lbUserSTatus = new Label();
             label4 = new Label();
-<<<<<<< HEAD
             gbSystem = new GroupBox();
             tvSystem = new TreeView();
-=======
-            gbUser = new GroupBox();
-            lstOnlineUsers = new ListBox();
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             gbLog = new GroupBox();
             rtbLogs = new RichTextBox();
             panel2 = new Panel();
@@ -72,48 +58,26 @@
             lbTitle = new Label();
             statusStrip1 = new StatusStrip();
             tsStatusServer = new ToolStripStatusLabel();
-<<<<<<< HEAD
             tsPort = new ToolStripStatusLabel();
-=======
-            toolStripStatusLabel1 = new ToolStripStatusLabel();
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             tsUsers = new ToolStripStatusLabel();
             tsMessages = new ToolStripStatusLabel();
             tsGroups = new ToolStripStatusLabel();
             tsTime = new ToolStripStatusLabel();
             panel1.SuspendLayout();
             gbBroadCast.SuspendLayout();
-<<<<<<< HEAD
             gbUserManagement.SuspendLayout();
             gbSystem.SuspendLayout();
-=======
-            groupBox1.SuspendLayout();
-            gbUser.SuspendLayout();
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             gbLog.SuspendLayout();
             panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nbPort).BeginInit();
             statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(12, 9);
-            label1.Name = "label1";
-            label1.Size = new Size(0, 25);
-            label1.TabIndex = 0;
-            // 
             // panel1
             // 
             panel1.Controls.Add(gbBroadCast);
-<<<<<<< HEAD
             panel1.Controls.Add(gbUserManagement);
             panel1.Controls.Add(gbSystem);
-=======
-            panel1.Controls.Add(groupBox1);
-            panel1.Controls.Add(gbUser);
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             panel1.Controls.Add(gbLog);
             panel1.Controls.Add(panel2);
             panel1.Controls.Add(lbTitle);
@@ -126,11 +90,7 @@
             // 
             gbBroadCast.Controls.Add(cbTarget);
             gbBroadCast.Controls.Add(cbTypeSend);
-<<<<<<< HEAD
             gbBroadCast.Controls.Add(txbBroadcast);
-=======
-            gbBroadCast.Controls.Add(textBox2);
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             gbBroadCast.Controls.Add(btnSend);
             gbBroadCast.Controls.Add(btnCancel);
             gbBroadCast.Controls.Add(label6);
@@ -146,11 +106,7 @@
             // cbTarget
             // 
             cbTarget.FormattingEnabled = true;
-<<<<<<< HEAD
-            cbTarget.Items.AddRange(new object[] { "" });
-=======
-            cbTarget.Items.AddRange(new object[] { "ALL", "PRIVATE", "GROUP" });
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
+            cbTarget.Items.AddRange(new object[] { "", "ALL", "PRIVATE", "GROUP" });
             cbTarget.Location = new Point(462, 140);
             cbTarget.Name = "cbTarget";
             cbTarget.Size = new Size(240, 40);
@@ -167,7 +123,6 @@
             cbTypeSend.TabIndex = 1;
             cbTypeSend.Text = "None";
             // 
-<<<<<<< HEAD
             // txbBroadcast
             // 
             txbBroadcast.Cursor = Cursors.IBeam;
@@ -176,16 +131,6 @@
             txbBroadcast.Name = "txbBroadcast";
             txbBroadcast.Size = new Size(1344, 79);
             txbBroadcast.TabIndex = 0;
-=======
-            // textBox2
-            // 
-            textBox2.Cursor = Cursors.IBeam;
-            textBox2.Location = new Point(9, 38);
-            textBox2.Multiline = true;
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(1344, 79);
-            textBox2.TabIndex = 0;
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             // 
             // btnSend
             // 
@@ -196,10 +141,7 @@
             btnSend.TabIndex = 2;
             btnSend.Text = "Send";
             btnSend.UseVisualStyleBackColor = true;
-<<<<<<< HEAD
             btnSend.Click += btnSend_Click;
-=======
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             // 
             // btnCancel
             // 
@@ -210,10 +152,7 @@
             btnCancel.TabIndex = 2;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
-<<<<<<< HEAD
             btnCancel.Click += btnCancel_Click;
-=======
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             // 
             // label6
             // 
@@ -233,7 +172,6 @@
             label5.TabIndex = 0;
             label5.Text = "Type:";
             // 
-<<<<<<< HEAD
             // gbUserManagement
             // 
             gbUserManagement.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
@@ -250,24 +188,6 @@
             gbUserManagement.TabIndex = 2;
             gbUserManagement.TabStop = false;
             gbUserManagement.Text = "USER MANAGEMENT";
-=======
-            // groupBox1
-            // 
-            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-            groupBox1.Controls.Add(cbSelectedUser);
-            groupBox1.Controls.Add(btnView);
-            groupBox1.Controls.Add(btnKick);
-            groupBox1.Controls.Add(lbSelcetdUserTile);
-            groupBox1.Controls.Add(lbUserSTatus);
-            groupBox1.Controls.Add(label4);
-            groupBox1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            groupBox1.Location = new Point(939, 191);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(423, 350);
-            groupBox1.TabIndex = 2;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "USER MANAGEMENT";
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             // 
             // cbSelectedUser
             // 
@@ -287,10 +207,7 @@
             btnView.TabIndex = 2;
             btnView.Text = "View";
             btnView.UseVisualStyleBackColor = true;
-<<<<<<< HEAD
             btnView.Click += btnView_Click;
-=======
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             // 
             // btnKick
             // 
@@ -301,10 +218,7 @@
             btnKick.TabIndex = 2;
             btnKick.Text = "Kick";
             btnKick.UseVisualStyleBackColor = true;
-<<<<<<< HEAD
             btnKick.Click += btnKick_Click;
-=======
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             // 
             // lbSelcetdUserTile
             // 
@@ -320,7 +234,7 @@
             lbUserSTatus.Anchor = AnchorStyles.Left;
             lbUserSTatus.AutoSize = true;
             lbUserSTatus.Font = new Font("Segoe UI Emoji", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lbUserSTatus.Location = new Point(103, 91);
+            lbUserSTatus.Location = new Point(103, 216);
             lbUserSTatus.Name = "lbUserSTatus";
             lbUserSTatus.Size = new Size(115, 32);
             lbUserSTatus.TabIndex = 0;
@@ -331,13 +245,12 @@
             label4.Anchor = AnchorStyles.Left;
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI Emoji", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label4.Location = new Point(6, 91);
+            label4.Location = new Point(6, 216);
             label4.Name = "label4";
             label4.Size = new Size(91, 32);
             label4.TabIndex = 0;
             label4.Text = "Status :";
             // 
-<<<<<<< HEAD
             // gbSystem
             // 
             gbSystem.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
@@ -358,28 +271,6 @@
             tvSystem.Name = "tvSystem";
             tvSystem.Size = new Size(291, 309);
             tvSystem.TabIndex = 0;
-=======
-            // gbUser
-            // 
-            gbUser.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-            gbUser.Controls.Add(lstOnlineUsers);
-            gbUser.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            gbUser.Location = new Point(6, 191);
-            gbUser.Name = "gbUser";
-            gbUser.Size = new Size(300, 350);
-            gbUser.TabIndex = 2;
-            gbUser.TabStop = false;
-            gbUser.Text = "ONLINE USERS";
-            // 
-            // lstOnlineUsers
-            // 
-            lstOnlineUsers.Dock = DockStyle.Fill;
-            lstOnlineUsers.FormattingEnabled = true;
-            lstOnlineUsers.Location = new Point(3, 35);
-            lstOnlineUsers.Name = "lstOnlineUsers";
-            lstOnlineUsers.Size = new Size(294, 312);
-            lstOnlineUsers.TabIndex = 0;
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             // 
             // gbLog
             // 
@@ -499,11 +390,7 @@
             // 
             statusStrip1.BackColor = Color.LemonChiffon;
             statusStrip1.ImageScalingSize = new Size(24, 24);
-<<<<<<< HEAD
             statusStrip1.Items.AddRange(new ToolStripItem[] { tsStatusServer, tsPort, tsUsers, tsMessages, tsGroups, tsTime });
-=======
-            statusStrip1.Items.AddRange(new ToolStripItem[] { tsStatusServer, toolStripStatusLabel1, tsUsers, tsMessages, tsGroups, tsTime });
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             statusStrip1.Location = new Point(0, 758);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(1380, 39);
@@ -518,7 +405,6 @@
             tsStatusServer.Size = new Size(198, 32);
             tsStatusServer.Text = "Server: ● Offline";
             // 
-<<<<<<< HEAD
             // tsPort
             // 
             tsPort.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -526,15 +412,6 @@
             tsPort.Padding = new Padding(0, 0, 50, 0);
             tsPort.Size = new Size(170, 32);
             tsPort.Text = "Port: 5000";
-=======
-            // toolStripStatusLabel1
-            // 
-            toolStripStatusLabel1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            toolStripStatusLabel1.Padding = new Padding(0, 0, 50, 0);
-            toolStripStatusLabel1.Size = new Size(170, 32);
-            toolStripStatusLabel1.Text = "Port: 5000";
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             // 
             // tsUsers
             // 
@@ -573,34 +450,21 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-<<<<<<< HEAD
             BackColor = Color.White;
-=======
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             ClientSize = new Size(1380, 797);
             Controls.Add(statusStrip1);
             Controls.Add(panel1);
-            Controls.Add(label1);
             Name = "ServerForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Chat Server";
-<<<<<<< HEAD
             Load += ServerForm_Load;
-=======
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             gbBroadCast.ResumeLayout(false);
             gbBroadCast.PerformLayout();
-<<<<<<< HEAD
             gbUserManagement.ResumeLayout(false);
             gbUserManagement.PerformLayout();
             gbSystem.ResumeLayout(false);
-=======
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
-            gbUser.ResumeLayout(false);
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
             gbLog.ResumeLayout(false);
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
@@ -613,7 +477,6 @@
 
         #endregion
 
-        private Label label1;
         private Panel panel1;
         private Label lbTitle;
         private Panel panel2;
@@ -622,11 +485,7 @@
         private NumericUpDown nbPort;
         private Label label3;
         private GroupBox gbLog;
-<<<<<<< HEAD
         private GroupBox gbSystem;
-=======
-        private GroupBox gbUser;
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel tsStatusServer;
         private ToolStripStatusLabel tsUsers;
@@ -634,22 +493,12 @@
         private ToolStripStatusLabel tsGroups;
         private ToolStripStatusLabel tsTime;
         private Label label2;
-<<<<<<< HEAD
         private RichTextBox rtbLogs;
         private GroupBox gbBroadCast;
         private TextBox txbBroadcast;
         private Button btnSend;
         private Button btnCancel;
         private GroupBox gbUserManagement;
-=======
-        private ListBox lstOnlineUsers;
-        private RichTextBox rtbLogs;
-        private GroupBox gbBroadCast;
-        private TextBox textBox2;
-        private Button btnSend;
-        private Button btnCancel;
-        private GroupBox groupBox1;
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
         private Label lbSelcetdUserTile;
         private ComboBox cbSelectedUser;
         private Button btnKick;
@@ -661,11 +510,7 @@
         private ComboBox cbTarget;
         private Label label6;
         private TextBox txbIPAddress;
-<<<<<<< HEAD
         private ToolStripStatusLabel tsPort;
         private TreeView tvSystem;
-=======
-        private ToolStripStatusLabel toolStripStatusLabel1;
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
     }
 }

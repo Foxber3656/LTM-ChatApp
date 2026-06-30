@@ -12,8 +12,4 @@
     <ProjectReference Include="..\ChatShared\ChatShared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Security\" />
-  </ItemGroup>
-
 </Project>

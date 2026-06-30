@@ -1,32 +1,28 @@
-<<<<<<< HEAD
-﻿using ChatApp_Shared.Enums;
 using ChatApp_Shared.DTOs;
+using ChatApp_Shared.Enums;
+using ChatApp_Shared.Packet;
+using ChatShared.Models;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-=======
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
+using ChatServer.Storage;
+using static System.Windows.Forms.AxHost;
 
 namespace ChatServer.Network
 {
     public class TCPServer
     {
-<<<<<<< HEAD
         #region fields
         private Socket? sckServer;
         private readonly List<Socket> sckClients = new();
         private readonly Dictionary<string, Socket> onlineUsers = new(); //quản lý online user
         private readonly Dictionary<string, List<string>> groups = new(); //quản lý group
-        private readonly Dictionary<string, string>groupOwners = new();
-        private readonly Dictionary<string,List<MessagePacket>>offlineMessages = new();
+        private readonly Dictionary<string, string> groupOwners = new();
+
+        private readonly AccountRepository accountRepository = new();
+        private readonly GroupRepository groupRepository = new();
+        private readonly MessageRepository messageRepository = new();
         #endregion
 
         #region Events
@@ -35,6 +31,16 @@ namespace ChatServer.Network
         public Action? OnUserListChanged;
         public Action? OnGroupListChanged;
         #endregion
+
+        public TCPServer()
+        {
+            foreach (Group group in groupRepository.GetAll())
+            {
+                groups[group.GroupName] = new List<string>(group.Members);
+
+                groupOwners[group.GroupName] = group.Owner;
+            }
+        }
 
         #region socket Callback
         //accept va luu client vao list
@@ -80,20 +86,36 @@ namespace ChatServer.Network
                     {
                         onlineUsers.Remove(username);
                         OnUserListChanged?.Invoke();
+                        SendUserList();
                         OnGroupListChanged?.Invoke();
                         Onlog?.Invoke($"{username} logged out.");
+                    }
+                    try
+                    {
+                        client.Shutdown(SocketShutdown.Both);
+                    }
+                    catch
+                    {
                     }
                     client.Close();
                     Onlog?.Invoke($"Client disconnected");
                     return;
                 }
-                string json = Encoding.UTF8.GetString(state.Buffer, 0, size);
-                MessagePacket? packet = JsonSerializer.Deserialize<MessagePacket>(json);
 
-                if (packet != null)
+                // Ghi dữ liệu mới vào Stream
+                state.Stream.Position = state.Stream.Length;
+                state.Stream.Write(state.Buffer, 0, size);
+
+                MessagePacket? packet;
+
+                while (PacketSerializer.TryReadPacket(state.Stream, out packet))
                 {
-                    ProcessPacket(packet, client);
+                    if (packet != null)
+                    {
+                        ProcessPacket(packet, client);
+                    }
                 }
+
                 client.BeginReceive(state.Buffer, 0, state.Buffer.Length, SocketFlags.None,
                     new AsyncCallback(ReceiveCallback), state);
             }
@@ -105,15 +127,6 @@ namespace ChatServer.Network
         #endregion
 
         #region server
-=======
-        private Socket sckServer;
-        private readonly List<Socket> sckClients = new();
-        private readonly byte[] rcvBuffer = new byte[4096]; // ReceiveCallback
-
-        //gui thong bao
-        public Action<string>? Onlog;
-
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
         // Socket -> Bind -> Listen -> Accept
         public void StartServer(int port)
         {
@@ -140,44 +153,22 @@ namespace ChatServer.Network
                 Onlog?.Invoke(ex.Message);
             }
         }
-<<<<<<< HEAD
-=======
-
-        //accept va luu client vao list
-        private void AcceptCallback(IAsyncResult result)
-        {
-            try
-            {
-                Socket client = sckServer.EndAccept(result);
-                sckClients.Add(client);
-
-                Onlog?.Invoke($"Client connected: {client.RemoteEndPoint}");
-                sckServer.BeginAccept(new AsyncCallback(AcceptCallback), null);
-            }
-            catch (Exception ex)
-            {
-                Onlog?.Invoke(ex.Message);
-            }
-        }
-        //dem onl user
-        public int OnlineCount
-        {
-            get
-            {
-                return sckClients.Count;
-            }
-        }
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
-        //dong server
         public void StopServer()
         {
             foreach (Socket client in sckClients)
             {
-<<<<<<< HEAD
+                try
+                {
+                    client.Shutdown(SocketShutdown.Both);
+                }
+                catch {}
                 client.Close();
             }
             sckClients.Clear();
             onlineUsers.Clear();
+            groups.Clear();
+            groupOwners.Clear();
+
             sckServer?.Close();
             sckServer = null;
             OnUserListChanged?.Invoke();
@@ -194,7 +185,6 @@ namespace ChatServer.Network
                 case MessageType.Login:
                     HandleLogin(packet, client);
                     break;
-
                 case MessageType.PrivateMessage:
                     HandlePrivateMessage(packet);
                     break;
@@ -203,6 +193,7 @@ namespace ChatServer.Network
                     HandleGroupMessage(packet);
                     break;
                 case MessageType.BroadcastMessage:
+                    BroadcastMessage(packet.Content);
                     break;
                 case MessageType.CreateGroup:
                     HandleCreateGroup(packet);
@@ -217,10 +208,36 @@ namespace ChatServer.Network
                     HandleLogout(packet);
                     break;
                 case MessageType.Register:
-                    HandleRegister(packet);
+                    HandleRegister(packet, client);
                     break;
-                case MessageType.FileTransfer:
-                    HandleFileTransfer(packet);
+                case MessageType.FileStart:
+                    HandleFileStart(packet);
+                    break;
+
+                case MessageType.FileChunk:
+                    HandleFileChunk(packet);
+                    break;
+
+                case MessageType.FileEnd:
+                    HandleFileEnd(packet);
+                    break;
+                case MessageType.FileAccept:
+                    ForwardPacket(packet);
+                    break;
+
+                case MessageType.FileReject:
+                    ForwardPacket(packet);
+                    break;
+                case MessageType.RecallMessage:
+
+                    ForwardPacket(packet);
+                    if (onlineUsers.TryGetValue(packet.Sender, out Socket? sender))
+                    {
+                        SendPacket(sender, packet);
+                    }
+                    break;
+                case MessageType.Typing:
+                    ForwardPacket(packet);
                     break;
             }
         }
@@ -229,22 +246,109 @@ namespace ChatServer.Network
         #region user
         private void HandleLogin(MessagePacket packet, Socket client)
         {
-            if (!onlineUsers.ContainsKey(packet.Sender))
+            Account? account = accountRepository.Find(packet.Sender);
+
+            if (account == null)
             {
-                onlineUsers.Add(packet.Sender,client);
-                if (offlineMessages.ContainsKey(packet.Sender))
+                SendPacket(client, new MessagePacket()
                 {
-                    foreach (MessagePacket msg in offlineMessages[packet.Sender])
+                    Type = MessageType.Login,
+                    Sender = "SERVER",
+                    Receiver = packet.Sender,
+                    Content = "USERNAME_NOT_FOUND"
+                });
+                return;
+            }
+
+            if (account.PasswordHash != packet.Content)
+            {
+                SendPacket(client, new MessagePacket()
+                {
+                    Type = MessageType.Login,
+                    Sender = "SERVER",
+                    Receiver = packet.Sender,
+                    Content = "INVALID_PASSWORD"
+                });
+                return;
+            }
+
+            if (onlineUsers.ContainsKey(packet.Sender))
+            {
+                SendPacket(client, new MessagePacket()
+                {
+                    Type = MessageType.Login,
+                    Sender = "SERVER",
+                    Receiver = packet.Sender,
+                    Content = "USERNAME_ALREADY_ONLINE"
+                });
+                return;
+            }
+
+            onlineUsers.Add(packet.Sender, client);
+
+            SendPacket(client, new MessagePacket()
+            {
+                Type = MessageType.Login,
+                Sender = "SERVER",
+                Receiver = packet.Sender,
+                Content = "LOGIN_SUCCESS"
+            });
+
+            OnUserListChanged?.Invoke();
+            SendUserList();
+            SendGroupList();
+
+            Onlog?.Invoke($"{packet.Sender} logged in.");
+        }
+        private void HandleRegister(MessagePacket packet, Socket client)
+        {
+            Onlog?.Invoke("HandleRegister called");
+            try
+            {
+                Onlog?.Invoke("1");
+
+                if (accountRepository.Exists(packet.Sender))
+                {
+                    Onlog?.Invoke("2");
+
+                    SendPacket(client, new MessagePacket()
                     {
-                        string json = JsonSerializer.Serialize(msg);
-                        byte[] data = Encoding.UTF8.GetBytes(json);
-                        client.Send(data);
-                    }
-                    Onlog?.Invoke($"{offlineMessages[packet.Sender].Count} offline messages delivered.");
-                    offlineMessages.Remove(packet.Sender);
+                        Type = MessageType.Register,
+                        Sender = "SERVER",
+                        Receiver = packet.Sender,
+                        Content = "USERNAME_EXISTS"
+                    });
+
+                    return;
                 }
-                OnUserListChanged?.Invoke();
-                Onlog?.Invoke($"{packet.Sender} logged in.");
+
+                Onlog?.Invoke("3");
+
+                Account account = new()
+                {
+                    UserName = packet.Sender,
+                    PasswordHash = packet.Content
+                };
+
+                Onlog?.Invoke("4");
+
+                accountRepository.Add(account);
+
+                Onlog?.Invoke("5");
+
+                SendPacket(client, new MessagePacket()
+                {
+                    Type = MessageType.Register,
+                    Sender = "SERVER",
+                    Receiver = packet.Sender,
+                    Content = "REGISTER_SUCCESS"
+                });
+
+                Onlog?.Invoke("6");
+            }
+            catch (Exception ex)
+            {
+                Onlog?.Invoke(ex.ToString());
             }
         }
         private void HandleLogout(MessagePacket packet)
@@ -253,67 +357,34 @@ namespace ChatServer.Network
                 return;
             Socket client = onlineUsers[packet.Sender];
             sckClients.Remove(client);
+            try
+            {
+                client.Shutdown(SocketShutdown.Both);
+            }
+            catch {}
             client.Close();
             onlineUsers.Remove(packet.Sender);
 
             OnUserListChanged?.Invoke();
             OnGroupListChanged?.Invoke();
+            SendUserList();
             Onlog?.Invoke($"{packet.Sender} logged out.");
         }
-        private void HandlePrivateMessage(MessagePacket packet)
+        private void HandleFileStart(MessagePacket packet)
         {
-            if (!onlineUsers.ContainsKey(packet.Receiver))
-            {
-                if (!offlineMessages.ContainsKey(packet.Receiver))
-                {
-                    offlineMessages.Add(
-                        packet.Receiver,
-                        new List<MessagePacket>());
-                }
-                offlineMessages[packet.Receiver].Add(packet);
-                Onlog?.Invoke($"Offline message saved for {packet.Receiver}");
-                return;
-            }
-            Socket receiver = onlineUsers[packet.Receiver];
-            string json = JsonSerializer.Serialize(packet);
-            byte[] data = Encoding.UTF8.GetBytes(json);
-            receiver.Send(data);
-            Onlog?.Invoke($"{packet.Sender} -> {packet.Receiver}");
+            ForwardPacket(packet);
+            Onlog?.Invoke($"[FILE START] {packet.Sender} -> {packet.Receiver}");
         }
-        private void HandleRegister(MessagePacket packet)
+
+        private void HandleFileChunk(MessagePacket packet)
         {
-            Onlog?.Invoke($"Register request: {packet.Sender}");
+            ForwardPacket(packet);
         }
-        private void HandleFileTransfer(MessagePacket packet)
+
+        private void HandleFileEnd(MessagePacket packet)
         {
-            Onlog?.Invoke(
-                $"File transfer: {packet.Sender}");
-        }
-        public void BroadcastMessage(string message)
-        {
-            MessagePacket packet = new MessagePacket()
-            {
-                Type = MessageType.BroadcastMessage,
-                Sender = "ADMIN",
-                Receiver = "ALL",
-                Content = message
-            };
-
-            string json = JsonSerializer.Serialize(packet);
-            byte[] data = Encoding.UTF8.GetBytes(json);
-
-            foreach (Socket client in sckClients)
-            {
-                try
-                {
-                    client.Send(data);
-                }
-                catch
-                {
-                }
-            }
-
-            Onlog?.Invoke($"[BROADCAST] {message}");
+            ForwardPacket(packet);
+            Onlog?.Invoke($"[FILE END] {packet.Sender}");
         }
         public void KickUser(string username)
         {
@@ -327,65 +398,91 @@ namespace ChatServer.Network
                 client.Shutdown(SocketShutdown.Both);
                 client.Close();
             }
-            catch
-            {
-            }
-
+            catch {}
             onlineUsers.Remove(username);
             sckClients.Remove(client);
 
             OnUserListChanged?.Invoke();
-
+            SendUserList();
+            SendGroupList();
             Onlog?.Invoke($"[KICK] {username}");
         }
         #endregion
 
-        #region group
+        #region msg
+        private void HandlePrivateMessage(MessagePacket packet)
+        {
+            messageRepository.Add(packet);
+            ForwardPacket(packet);
+            Onlog?.Invoke($"[PRIVATE] {packet.Sender} -> {packet.Receiver}");
+        }
         private void HandleGroupMessage(MessagePacket packet)
         {
+            messageRepository.Add(packet);
             if (!groups.ContainsKey(packet.Receiver))
                 return;
 
-            List<string> members =
-                groups[packet.Receiver];
-
-            string json =
-                JsonSerializer.Serialize(packet);
-
-            byte[] data =
-                Encoding.UTF8.GetBytes(json);
-
+            List<string> members = groups[packet.Receiver];
             foreach (string username in members)
             {
                 if (username == packet.Sender)
                     continue;
-
                 if (!onlineUsers.ContainsKey(username))
-                {
-                    if (!offlineMessages.ContainsKey(username))
-                    {
-                        offlineMessages.Add(username,new List<MessagePacket>());
-                    }
-                    offlineMessages[username].Add(packet);
                     continue;
-                }                 
-                onlineUsers[username].Send(data);
+                try
+                {
+                    SendPacket(onlineUsers[username], packet);
+                }
+                catch { }
             }
-            Onlog?.Invoke($"Group message -> {packet.Receiver}");
+            Onlog?.Invoke($"[GROUP] {packet.Sender} -> {packet.Receiver}");
         }
+        public void BroadcastMessage(string message)
+        {
+            MessagePacket packet = new MessagePacket()
+            {
+                Type = MessageType.BroadcastMessage,
+                Sender = "SERVER",
+                Receiver = "ALL",
+                Content = message
+            };
+            messageRepository.Add(packet);
+            foreach (Socket client in onlineUsers.Values)
+            {
+                try
+                {
+                    SendPacket(client, packet);
+                }
+                catch (Exception ex)
+                {
+                    Onlog?.Invoke(ex.Message);
+                }
+            }
+            Onlog?.Invoke($"[BROADCAST] {message}");
+        }
+        #endregion
+
+        #region group
         private void HandleCreateGroup(MessagePacket packet)
         {
             if (groups.ContainsKey(packet.Receiver))
                 return;
-            groupOwners[packet.Receiver] = packet.Sender;
-            groups.Add(packet.Receiver, new List<string>()
-                {
-                packet.Sender
-                });
-            OnGroupListChanged?.Invoke();
+            List<string>? members = JsonSerializer.Deserialize<List<string>>(packet.Content);
+            if (members == null)
+                return;
 
-            Onlog?.Invoke(
-                $"Group created: {packet.Receiver}");
+            groupOwners[packet.Receiver] = packet.Sender;
+            groups.Add(packet.Receiver, members);
+
+            groupRepository.Add(new Group()
+            {
+                GroupName = packet.Receiver,
+                Owner = packet.Sender,
+                Members = new List<string>(members)
+            });
+            OnGroupListChanged?.Invoke();
+            SendGroupList();
+            Onlog?.Invoke($"Group created: {packet.Receiver}");
         }
         private void HandleAddMember(MessagePacket packet)
         {
@@ -397,6 +494,15 @@ namespace ChatServer.Network
             {
                 groups[packet.Receiver].Add(packet.Content);
                 OnGroupListChanged?.Invoke();
+
+                Group? group = groupRepository.Find(packet.Receiver);
+
+                if (group != null)
+                {
+                    group.Members.Add(packet.Content);
+                    groupRepository.Save();
+                }
+                SendGroupList();
                 Onlog?.Invoke(
                     $"{packet.Content} added to {packet.Receiver}");
             }
@@ -405,15 +511,150 @@ namespace ChatServer.Network
         {
             if (!groups.ContainsKey(packet.Receiver))
                 return;
-
             groups[packet.Receiver].Remove(packet.Content);
-            OnGroupListChanged?.Invoke();
 
-            Onlog?.Invoke(
-                $"{packet.Content} removed from {packet.Receiver}");
+            Group? group = groupRepository.Find(packet.Receiver);
+
+            if (group != null)
+            {
+                group.Members.Remove(packet.Content);
+
+                if (group.Members.Count == 0)
+                {
+                    groupRepository.Delete(packet.Receiver);
+                }
+                else
+                {
+                    groupRepository.Save();
+                }
+            }
+
+            if (groups[packet.Receiver].Count == 0)
+            {
+                groups.Remove(packet.Receiver);
+                groupOwners.Remove(packet.Receiver);
+            }
+            OnGroupListChanged?.Invoke();
+            SendGroupList();
+            Onlog?.Invoke($"{packet.Content} removed from {packet.Receiver}");
         }
         #endregion
 
+        #region send
+        private void SendPacket(Socket client, MessagePacket packet)
+        {
+            byte[] data = PacketSerializer.Serialize(packet);
+            client.Send(data);
+        }
+        private void SendUserList()
+        {
+            MessagePacket packet = new MessagePacket()
+            {
+                Type = MessageType.UserList,
+                Sender = "SERVER",
+                Content = JsonSerializer.Serialize(OnlineUsers)
+            };
+            foreach (Socket client in onlineUsers.Values)
+            {
+                try
+                {
+                    SendPacket(client, packet);
+                }
+                catch {}
+            }
+        }
+        private void SendGroupList()
+        {
+            List<Group> list = new();
+
+            foreach (string groupName in groups.Keys)
+            {
+                Group info = new()
+                {
+                    GroupName = groupName,
+                    Owner = groupOwners[groupName],
+                    Members = new List<string>(groups[groupName])
+                };
+
+                list.Add(info);
+            }
+
+            MessagePacket packet = new()
+            {
+                Type = MessageType.GroupList,
+                Sender = "SERVER",
+                Content = JsonSerializer.Serialize(list)
+            };
+
+            foreach (Socket client in onlineUsers.Values)
+            {
+                try
+                {
+                    SendPacket(client, packet);
+                }
+                catch {}
+            }
+        }
+        public void SendPrivateMessage(string receiver, string message)
+        {
+            MessagePacket packet = new()
+            {
+                Type = MessageType.PrivateMessage,
+                Sender = "SERVER",
+                Receiver = receiver,
+                Content = message
+            };
+            try
+            {
+                SendPacket(onlineUsers[receiver], packet);
+                Onlog?.Invoke($"[SERVER -> {receiver}] {message}");
+            }
+            catch (Exception ex)
+            {
+                Onlog?.Invoke(ex.Message);
+            }
+        }
+        public void SendGroupMessage(string groupName, string message)
+        {
+            if (!groups.ContainsKey(groupName))
+            {
+                Onlog?.Invoke($"Group {groupName} not found.");
+                return;
+            }
+            MessagePacket packet = new()
+            {
+                Type = MessageType.GroupMessage,
+                Sender = "SERVER",
+                Receiver = groupName,
+                Content = message
+            };
+
+            foreach (string username in groups[groupName])
+            {
+                try
+                {
+                    SendPacket(onlineUsers[username], packet);
+                }
+                catch (Exception ex)
+                {
+                    Onlog?.Invoke(ex.Message);
+                }
+            }
+            Onlog?.Invoke($"[SERVER -> GROUP {groupName}] {message}");
+        }
+        #endregion
+
+        #region methods
+        private void ForwardPacket(MessagePacket packet)
+        {
+            if (onlineUsers.TryGetValue(packet.Receiver, out Socket? socket))
+            {
+                SendPacket(socket, packet);
+            }
+        }
+        #endregion
+
+        #region fill
         public List<string> OnlineUsers
         {
             get{return onlineUsers.Keys.ToList();}
@@ -441,22 +682,11 @@ namespace ChatServer.Network
         }
         public bool IsRunning
         {
-            get { return sckServer != null; }
-=======
-                sckServer?.Close();
-                sckServer = null;
-            }
-            sckClients.Clear();
-            sckServer?.Close();
-            Onlog?.Invoke("Server stopped.");
-        }
-        public bool IsRunning
-        {
             get
             {
                 return sckServer != null;
             }
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
         }
+        #endregion
     }
 }

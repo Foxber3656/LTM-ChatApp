@@ -1,105 +1,130 @@
-<<<<<<< HEAD
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChatClient.Network
-{
-    internal class TCPClient
-    {
-    }
-}
-=======
-﻿using System.Net;
+﻿using ChatApp_Shared.DTOs;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
+using ChatApp_Shared.Packet;
 
 namespace ChatClient.Network
 {
     public class TCPClient
     {
-        private Socket? _socket;
-        private readonly byte[] _buffer = new byte[4096];
-        private readonly List<byte> _dataBuffer = new(); // Lưu dữ liệu chưa xử lý
+        #region Fields
+        private Socket? sckClient;
+        #endregion
 
-        public event Action? OnConnected;
-        public event Action<string>? OnMessageReceived; // nhận JSON string
-        public event Action<string>? OnDisconnected;
-        public event Action<string>? OnError;
+        #region Events
+        public Action<string>? OnLog;
+        public Action<MessagePacket>? OnPacketReceived;
+        public Action? OnDisconnected;
 
-        public bool IsConnected => _socket != null && _socket.Connected;
+        #endregion
 
-        public async Task ConnectAsync(string ip, int port)
+        #region Socket Callback
+        private void ReceiveCallback(IAsyncResult result)
         {
             try
             {
-                _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                await _socket.ConnectAsync(IPAddress.Parse(ip), port);
-                OnConnected?.Invoke();
-                _ = ReceiveLoopAsync();
-            }
-            catch (Exception ex)
-            {
-                OnError?.Invoke(ex.Message);
-                Disconnect();
-            }
-        }
-
-        private async Task ReceiveLoopAsync()
-        {
-            try
-            {
-                while (_socket != null && _socket.Connected)
+                ClientState state = (ClientState)result.AsyncState!;
+                Socket client = state.ClientSocket;
+                int size = client.EndReceive(result);
+                if (size <= 0)
                 {
-                    int bytesRead = await _socket.ReceiveAsync(_buffer, SocketFlags.None);
-                    if (bytesRead == 0) break;
+                    Disconnect();
+                    return;
+                }
+                // Ghi dữ liệu nhận được vào Stream
+                state.Stream.Position = state.Stream.Length;
+                state.Stream.Write(state.Buffer, 0, size);
 
-                    _dataBuffer.AddRange(_buffer.Take(bytesRead));
-
-                    // Xử lý các gói tin kết thúc bằng '\n'
-                    while (_dataBuffer.Count > 0)
+                MessagePacket? packet;
+                while (PacketSerializer.TryReadPacket(state.Stream, out packet))
+                {
+                    if (packet != null)
                     {
-                        int index = _dataBuffer.IndexOf((byte)'\n');
-                        if (index == -1) break;
-
-                        byte[] packetBytes = _dataBuffer.Take(index).ToArray();
-                        _dataBuffer.RemoveRange(0, index + 1);
-
-                        string json = Encoding.UTF8.GetString(packetBytes);
-                        OnMessageReceived?.Invoke(json);
+                        ProcessPacket(packet);
                     }
                 }
+                client.BeginReceive(state.Buffer, 0, state.Buffer.Length,
+                    SocketFlags.None, ReceiveCallback, state);
             }
             catch (Exception ex)
             {
-                OnError?.Invoke(ex.Message);
-            }
-            finally
-            {
+                OnLog?.Invoke(ex.Message);
                 Disconnect();
             }
         }
+        #endregion
 
-        public async Task SendAsync(string jsonMessage)
+        #region Connection
+        public void Connect(string ip, int port)
         {
-            if (!IsConnected) return;
-            byte[] data = Encoding.UTF8.GetBytes(jsonMessage + "\n");
-            await _socket!.SendAsync(data, SocketFlags.None);
+            try
+            {
+                sckClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                sckClient.Connect(IPAddress.Parse(ip), port);
+                ClientState state = new ClientState()
+                {
+                    ClientSocket = sckClient
+                };
+                sckClient.BeginReceive(state.Buffer, 0, state.Buffer.Length, 
+                    SocketFlags.None, ReceiveCallback, state);
+                OnLog?.Invoke( $"Connected to {ip}:{port}");
+            }
+            catch (Exception ex)
+            {
+                OnLog?.Invoke(ex.Message);
+            }
         }
-
         public void Disconnect()
         {
             try
             {
-                _socket?.Close();
-                _socket = null;
-                _dataBuffer.Clear();
-                OnDisconnected?.Invoke("Disconnected.");
+                sckClient?.Close();
             }
-            catch { }
+            catch {}
+            sckClient = null;
+            OnDisconnected?.Invoke();
+            OnLog?.Invoke("Disconnected.");
         }
+        #endregion
+
+        #region Packet
+        public void SendPacket(MessagePacket packet)
+        {
+            if (!IsConnected)
+                return;
+            try
+            {
+                byte[] data = PacketSerializer.Serialize(packet);
+                sckClient!.Send(data);
+            }
+            catch (Exception ex)
+            {
+                OnLog?.Invoke(ex.Message);
+            }
+        }
+        private void ProcessPacket(MessagePacket packet)
+        {
+            OnPacketReceived?.Invoke(packet);
+        }
+        #endregion
+
+        #region Properties
+        public bool IsConnected
+        {
+            get
+            {
+                return sckClient != null && sckClient.Connected;
+            }
+        }
+        public Socket? ClientSocket
+        {
+            get
+            {
+                return sckClient;
+            }
+        }
+        #endregion
     }
 }
->>>>>>> c9586379bdf71fa3ea0837fe1bad7b2ba3c4486d
